@@ -1,0 +1,35 @@
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Bloom Filter</title>
+    <!-- <link rel="stylesheet" href="../lib/mocha/mocha.css" /> -->
+    <script src="./jquery.js"></script>
+    <script src="./underscore.js"></script>
+    <script src="./bloomFilterHelper.js"></script>
+    <script src="./bloomFilter.js"></script>
+    <script src="./main.js"></script>
+  </head>
+  <body>
+    <header class="title">Bloom Filter</header>
+    <form class="storage">
+        <header>Internal Storage</header>
+        <p class="storage_rendering"></p>
+    </form>
+    <form class="add">
+        <header>Add</header>
+        Enter String: <input type="text" name="item" placeholder="some string" />
+        <button>Enter</button>
+        <p class="add_message"></p>
+    </form>
+    <form class="query">
+        <header>Query</header>
+        Enter String: <input type="text" name="item" placeholder="some string" />
+        <button>Enter</button>
+        <p class="query_message"></p>
+    </form>
+    <form class="false_positive">
+        <header>False Positive Rate</header>
+        <p></p>
+    </form>
+  </body>
+</html>
