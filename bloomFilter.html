@@ -3,6 +3,7 @@
     <meta charset="utf-8">
     <title>Bloom Filter</title>
     <!-- <link rel="stylesheet" href="../lib/mocha/mocha.css" /> -->
+    <link rel="stylesheet" href="./style.css">
     <script src="./jquery.js"></script>
     <script src="./underscore.js"></script>
     <script src="./bloomFilterHelper.js"></script>
@@ -14,7 +15,10 @@
     <form class="storage">
         <header>Internal Storage</header>
         <p class="storage_rendering"></p>
+        <div class="k">k: <input type="number" name="k" placeholder = 3 /><button>Enter</button></div>
+        <div class="m">m: <input type="number" name="m" placeholder = 18 /><button>Enter</button></div>
     </form>
+    <div class="add-query">
     <form class="add">
         <header>Add</header>
         Enter String: <input type="text" name="item" placeholder="some string" />
@@ -25,11 +29,14 @@
         <header>Query</header>
         Enter String: <input type="text" name="item" placeholder="some string" />
         <button>Enter</button>
-        <p class="query_message"></p>
+        <p>Is the element in the set?</p> 
+        <p class="query_message">Nothing to query</p>
     </form>
+    </div>
     <form class="false_positive">
         <header>False Positive Rate</header>
-        <p></p>
+        <button>Calculate</button>
+        <p>%</p>    
     </form>
   </body>
 </html>

@@ -1,60 +1,96 @@
-var BloomFilterStorage = function(storageSize) {
+var BloomFilterStorage = function(m, k) {
   this.storage = [];
-  this.max = storageSize;
+  this.max = m;
+  this.k = k;
   for(var i = 0; i<this.max; i++){
-    this.storage.push(false);
+    this.storage.push(0);
   }
 };
 
-BloomFilterStorage.prototype.hash1 = function(str, max){
-  var hash = 0;
-  for (var i = 0; i < str.length; i++) {
-    hash = (hash<<5) + hash + str.charCodeAt(i);
-    hash = hash & hash; // Convert to 32bit integer
-    hash = Math.abs(hash);
-  }
-  return hash % max;
-};
+/**
+ * JS Implementation of MurmurHash2
+ * 
+ * @author <a href="mailto:gary.court@gmail.com">Gary Court</a>
+ * @see http://github.com/garycourt/murmurhash-js
+ * @author <a href="mailto:aappleby@gmail.com">Austin Appleby</a>
+ * @see http://sites.google.com/site/murmurhash/
+ * 
+ * @param {string} str ASCII only
+ * @param {number} seed Positive integer only
+ * @return {number} 32-bit positive integer hash
+ */
 
-BloomFilterStorage.prototype.hash2 = function(str, max){
-  var hash = 0;
-  for (var i = 0; i < str.length; i++) {
-    hash = (hash<<5) + hash + str.charCodeAt(i);
-    hash = hash & hash; // Convert to 32bit integer
-    hash = Math.abs(hash);
-  }
-  return (hash >> 14) % max;
-};
+BloomFilterStorage.prototype.hash = function (key, seed) {
+        var remainder, bytes, h1, h1b, c1, c1b, c2, c2b, k1, i;
+        
+        remainder = key.length & 3; // key.length % 4
+        bytes = key.length - remainder;
+        h1 = seed;
+        c1 = 0xcc9e2d51;
+        c2 = 0x1b873593;
+        i = 0;
+        
+        while (i < bytes) {
+                  k1 = 
+                    ((key.charCodeAt(i) & 0xff)) |
+                    ((key.charCodeAt(++i) & 0xff) << 8) |
+                    ((key.charCodeAt(++i) & 0xff) << 16) |
+                    ((key.charCodeAt(++i) & 0xff) << 24);
+                ++i;
+                
+                k1 = ((((k1 & 0xffff) * c1) + ((((k1 >>> 16) * c1) & 0xffff) << 16))) & 0xffffffff;
+                k1 = (k1 << 15) | (k1 >>> 17);
+                k1 = ((((k1 & 0xffff) * c2) + ((((k1 >>> 16) * c2) & 0xffff) << 16))) & 0xffffffff;
 
-BloomFilterStorage.prototype.hash3 = function(str, max){
-  var hash = 0;
-  for (var i = 0; i < str.length; i++) {
-    hash = (hash<<5) + hash + str.charCodeAt(i);
-    hash = hash & hash; // Convert to 32bit integer
-    hash = Math.abs(hash);
-  }
-  return (hash >> 12) % max;
-};
+                h1 ^= k1;
+        h1 = (h1 << 13) | (h1 >>> 19);
+                h1b = ((((h1 & 0xffff) * 5) + ((((h1 >>> 16) * 5) & 0xffff) << 16))) & 0xffffffff;
+                h1 = (((h1b & 0xffff) + 0x6b64) + ((((h1b >>> 16) + 0xe654) & 0xffff) << 16));
+        }
+        
+        k1 = 0;
+        
+        switch (remainder) {
+                case 3: k1 ^= (key.charCodeAt(i + 2) & 0xff) << 16;
+                case 2: k1 ^= (key.charCodeAt(i + 1) & 0xff) << 8;
+                case 1: k1 ^= (key.charCodeAt(i) & 0xff);
+                
+                k1 = (((k1 & 0xffff) * c1) + ((((k1 >>> 16) * c1) & 0xffff) << 16)) & 0xffffffff;
+                k1 = (k1 << 15) | (k1 >>> 17);
+                k1 = (((k1 & 0xffff) * c2) + ((((k1 >>> 16) * c2) & 0xffff) << 16)) & 0xffffffff;
+                h1 ^= k1;
+        }
+        
+        h1 ^= key.length;
 
-BloomFilterStorage.prototype.set = function(string){
-  var iOne = this.hash1(string, this.max);
-  var iTwo = this.hash2(string, this.max);
-  var iThree = this.hash3(string,this.max);
-  this.storage[iOne] = true;
-  this.storage[iTwo] = true;
-  this.storage[iThree] = true;
+        h1 ^= h1 >>> 16;
+        h1 = (((h1 & 0xffff) * 0x85ebca6b) + ((((h1 >>> 16) * 0x85ebca6b) & 0xffff) << 16)) & 0xffffffff;
+        h1 ^= h1 >>> 13;
+        h1 = ((((h1 & 0xffff) * 0xc2b2ae35) + ((((h1 >>> 16) * 0xc2b2ae35) & 0xffff) << 16))) & 0xffffffff;
+        h1 ^= h1 >>> 16;
+
+        var result = h1 >>> 0;
+        return result % this.max;
 }
 
-BloomFilterStorage.prototype.get = function(string) {
-  var allTrue = false;
-  var iOne = this.hash1(string, this.max);
-  var iTwo = this.hash2(string, this.max);
-  var iThree = this.hash3(string, this.max);
-
-  if (this.storage[iOne] && this.storage[iTwo] && this.storage[iThree]) {
-    allTrue = true;
+BloomFilterStorage.prototype.set = function(str){
+  for (var i = 0; i < this.k; i++) {
+    this.storage[this.hash(str, i)] = 1;
   }
-  return allTrue;
+}
+
+BloomFilterStorage.prototype.get = function(str) {
+  var indices = [];
+  for (var i = 0; i < this.k; i++) {
+    indices.push(this.hash(str, i));
+  }
+  that = this;
+  return _.every(indices, function(index){
+    if (that.storage[index]) {
+      return true;
+    }
+    return false;
+  });
 };
 
 

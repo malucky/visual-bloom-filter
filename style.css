@@ -1,0 +1,43 @@
+@font-face {
+ font-family: 'GoodDog';
+ src: url('./GoodDog/GoodDog.otf');
+}
+
+header {
+	font: 1.8em/2.1em sans-serif;
+}
+form {
+	margin: 10px auto;
+	width: 60%;
+	text-align: center;
+}
+p {
+	font-size: 1.2em;
+}
+.add-query {
+	clear: both;
+	width: 80%;
+	margin: auto;
+	display: block;
+	height: 200px;
+}
+.title{
+	font: 3.5em/2em bold 'GoodDog';
+	text-align: center;
+}
+.storage p {
+	font-size: 1.8em;
+}
+.add, .query{
+	width: 45%;
+	float: left;
+}
+.query {
+	float: right;
+}
+.no {
+	color: red;
+}
+.yes {
+	color: green;
+}

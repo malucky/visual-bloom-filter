@@ -1,12 +1,11 @@
-var Bloomfilter = function(buckets){
-  this.buckets = buckets || 18
-  this._storage = new BloomFilterStorage(buckets)
-}
+var Bloomfilter = function(m, k){
+  this._storage = new BloomFilterStorage(m, k);
+};
 
 Bloomfilter.prototype.add = function(string){
-  this._storage.set(string)
-}
+  this._storage.set(string);
+};
 
 Bloomfilter.prototype.query = function(string){
-  return this._storage.get(string)
-}
+  return this._storage.get(string);
+};
