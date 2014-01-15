@@ -8,7 +8,7 @@ var BloomFilterStorage = function(m, k) {
 };
 
 /**
- * JS Implementation of MurmurHash2
+ * JS Implementation of MurmurHash3
  * 
  * @author <a href="mailto:gary.court@gmail.com">Gary Court</a>
  * @see http://github.com/garycourt/murmurhash-js

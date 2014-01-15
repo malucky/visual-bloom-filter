@@ -87,28 +87,41 @@ $(document).ready(function(){
 	    var falseQueries = 10000;
 	    var numOfTrials = 100;
 
-		var calculateFPOnce = function(){
-			var bloomFilter2 = new Bloomfilter(m,  k);
-			for (var i = 0; i < n; i++) {
-	  			bloomFilter2.add(makeRandomStr());
-		  	}
-			var counter = 0;
+		// var calculateFPOnce = function(){
+		
+		/* calculate false positive without depending on specific values of added strings */
+		// 	var bloomFilter2 = new Bloomfilter(m,  k);
+		// 	for (var i = 0; i < n; i++) {
+	 //  			bloomFilter2.add(makeRandomStr());
+		//   	}
+		// 	var counter = 0;
 		    
-		    for (var i = 0; i < falseQueries; i++) {
-		      if (bloomFilter2.query(makeRandomStr())) {
-		        counter++;
-		      }
-		    }
-		    FPs.push(counter/falseQueries*100);
+		//     for (var i = 0; i < falseQueries; i++) {
+		//       if (bloomFilter2.query(makeRandomStr())) {
+		//         counter++;
+		//       }
+		//     }
+		//     FPs.push(counter/falseQueries*100);
+		// };
+
+		// for (var i = 0; i < numOfTrials; i++) {
+		// 	calculateFPOnce();
+		// }
+		// var fpRate = _.reduce(FPs, function(prevValue, value){
+		// 	return prevValue + value;
+		// }, 0)/numOfTrials;
+		
+		var calculateFP = function(){
+			var counter = 0;
+			for (var i = 0; i < falseQueries; i++) {
+				if (bloomFilter.query(makeRandomStr())) {
+					counter++;
+				}
+			}
+			return counter / falseQueries * 100;
 		};
 
-		for (var i = 0; i < numOfTrials; i++) {
-			calculateFPOnce();
-		}
-		var fpRate = _.reduce(FPs, function(prevValue, value){
-			return prevValue + value;
-		}, 0)/numOfTrials;
-		$false_positive.find('p').text(fpRate+"%");
+		$false_positive.find('p').text(calculateFP()+"%");
 	};
 	render();    
 });
